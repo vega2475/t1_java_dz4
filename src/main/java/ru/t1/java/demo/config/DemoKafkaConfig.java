@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.CommonErrorHandler;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 @Slf4j
 @Configuration
-public class KafkaConfig {
+public class DemoKafkaConfig<T> {
 
     @Value("${t1.kafka.consumer.group-id}")
     private String groupId;
@@ -99,7 +100,8 @@ public class KafkaConfig {
     }
 
     @Bean("client")
-    public KafkaTemplate<String, ClientDto> kafkaTemplate(ProducerFactory<String, ClientDto> producerPatFactory) {
+    @Primary
+    public KafkaTemplate<String, T> kafkaClientTemplate(@Qualifier("producerClientFactory") ProducerFactory<String, T> producerPatFactory) {
         return new KafkaTemplate<>(producerPatFactory);
     }
 
@@ -107,13 +109,13 @@ public class KafkaConfig {
     @ConditionalOnProperty(value = "t1.kafka.producer.enable",
             havingValue = "true",
             matchIfMissing = true)
-    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate template) {
+    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, ClientDto> template) {
         template.setDefaultTopic(clientTopic);
         return new KafkaClientProducer(template);
     }
 
-    @Bean
-    public ProducerFactory<String, ClientDto> producerClientFactory() {
+    @Bean("producerClientFactory")
+    public ProducerFactory<String, T> producerClientFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

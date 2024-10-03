@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.t1.java.demo.exception.NotYetImplementedException;
 import ru.t1.java.demo.kafka.KafkaClientProducer;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.dto.ClientDto;
@@ -25,12 +26,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void registerClients(List<Client> clients) {
-        repository.saveAll(clients)
-                .stream()
-                .map(Client::getId)
-                .forEach(kafkaClientProducer::send);
+        throw new NotYetImplementedException();
+//        repository.saveAll(clients)
+//                .stream()
+//                .map(Client::getId)
+//                .forEach(kafkaClientProducer::send);
     }
 
+    //    @Transactional
     @Override
     public List<ClientDto> parseJson() {
         ObjectMapper mapper = new ObjectMapper();
@@ -39,7 +42,8 @@ public class ClientServiceImpl implements ClientService {
         try {
             clients = mapper.readValue(new File("src/main/resources/MOCK_DATA.json"), ClientDto[].class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            log.warn("Exception: ", e);
         }
 
         return Arrays.asList(clients);
