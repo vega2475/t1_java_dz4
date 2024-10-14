@@ -85,7 +85,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                 auth.requestMatchers("/api/auth/**").anonymous()
                                         .requestMatchers("/parse/**").anonymous()
                                         .requestMatchers("/parse").anonymous()
-                                        .anyRequest().permitAll()
+                                        .requestMatchers("/actuator/prometheus").anonymous()
+                                        .requestMatchers("/actuator/*").anonymous()
+                                        .anyRequest().anonymous()
                 );
 
         http.authenticationProvider(authenticationProvider());
