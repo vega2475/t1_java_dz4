@@ -1,4 +1,4 @@
-version: '1.0'
+version: '3'
 
 services:
   wiremock-demo:
@@ -22,7 +22,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     ports:
-      - 9090:9090
+      - "9090:9090"
     restart: unless-stopped
     environment:
       TZ: "Europe/Moscow"
@@ -36,6 +36,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=0000
+      - POSTGRES_DB=t1_demo
   zookeeper_t1:
     image: confluentinc/cp-zookeeper:5.5.0
     hostname: zookeeper_t1
